@@ -1,0 +1,124 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Custom class for a subtle transition on product cards */
+.product-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Hide the default clear button in Webkit browsers for search input */
+input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    display: none;
+}
+input[type="search"]::-ms-clear { /* For IE/Edge */
+    display: none;
+}
+
+.nav-link {
+    position: relative;
+    color: #4a5568; /* gray-700 */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #f97316; /* orange-500 */
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 2px;
+    bottom: -4px;
+    left: 0;
+    background-color: #f97316; /* orange-500 */
+    transform-origin: bottom right;
+    transition: transform 0.3s ease-out;
+}
+
+@media (max-width: 767px) {
+    .nav-link::after {
+        display: none;
+    }
+    .nav-link {
+        border-bottom: 1px solid #e5e7eb; /* gray-200 */
+    }
+    .nav-link:last-child {
+        border-bottom: none;
+    }
+}
+
+.nav-link:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
+.nav-link.active {
+    color: #f97316; /* orange-500 */
+    font-weight: 500;
+}
+.nav-link.active::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
+/* Cart Icon Animation */
+@keyframes jiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-15deg); }
+  50% { transform: rotate(15deg); }
+  75% { transform: rotate(-15deg); }
+}
+
+.jiggle {
+  animation: jiggle 0.5s ease-in-out;
+}
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+
+#cart-count.pop {
+    animation: pop 0.3s ease-in-out;
+}
+
+/* Cart Modal specific styles */
+/* The parent now controls the fade-in background */
+#cart-modal.open {
+    opacity: 1;
+}
+
+/* The panel inside slides independently */
+#cart-modal.open #cart-panel {
+    transform: translateX(0);
+}
+
+/* Ensure the full screen overlay is visible when the modal is open, 
+   overriding Tailwind's 'hidden' which sets display: none. */
+#cart-modal:not(.hidden) {
+    display: block; /* Changed from flex to block as ml-auto handles positioning */
+}
+
+/* Auth Modal Styles */
+/* Ensure the full screen overlay is visible when the auth modal is open */
+#auth-modal:not(.hidden) {
+    display: flex;
+}
+
+#auth-modal.open #auth-modal-content {
+    transform: scale(1);
+    opacity: 1;
+}
