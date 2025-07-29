@@ -42,6 +42,19 @@ En la configuración de tu servicio en Render, agrega estas variables:
 - `NODE_ENV`: `production`
 - `JWT_SECRET`: Una cadena secreta aleatoria (puedes generar una en [este sitio](https://generate-secret.vercel.app/32))
 
+**Nota**: Las variables de entorno también están configuradas en `render.yaml`, pero puedes sobrescribirlas en el dashboard de Render si es necesario.
+
+#### Formato correcto del MONGODB_URI:
+```
+mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/database_name?retryWrites=true&w=majority&appName=Cluster0
+```
+
+**Importante**: 
+- Reemplaza `username` y `password` con tus credenciales reales
+- Reemplaza `cluster0.xxxxx.mongodb.net` con tu cluster real
+- Reemplaza `database_name` con el nombre de tu base de datos (ej: `miau_store`)
+- NO uses caracteres especiales como `<>` en la contraseña
+
 ### 5. Deploy
 
 1. Render automáticamente detectará los cambios y hará el deploy
@@ -67,6 +80,36 @@ Si quieres agregar datos de prueba:
 
 ## Solución de Problemas
 
-- **Error de conexión a MongoDB**: Verifica que la IP esté permitida en Network Access
+### Error de Autenticación MongoDB (Error 8000)
+Si ves el error "bad auth : authentication failed":
+
+1. **Verifica las credenciales**:
+   - Usuario y contraseña correctos en MongoDB Atlas
+   - NO uses caracteres especiales como `<>` en la contraseña
+   - La contraseña debe estar sin comillas ni caracteres de escape
+
+2. **Verifica la configuración del usuario**:
+   - Ve a "Database Access" en MongoDB Atlas
+   - Asegúrate de que el usuario tenga permisos de "Read and write to any database"
+   - O específicamente permisos en la base de datos `miau_store`
+
+3. **Verifica el formato de la URI**:
+   ```
+   ✅ Correcto: mongodb+srv://usuario:contraseña@cluster0.xxxxx.mongodb.net/miau_store
+   ❌ Incorrecto: mongodb+srv://usuario:<contraseña>@cluster0.xxxxx.mongodb.net/miau_store
+   ```
+
+### Otros Problemas Comunes
+
+- **Error de conexión a MongoDB**: Verifica que la IP esté permitida en Network Access (usa 0.0.0.0/0 para permitir todas)
 - **Variables de entorno**: Asegúrate de que todas las variables estén configuradas en Render
 - **Logs**: Revisa los logs en el dashboard de Render para errores específicos
+- **Timeout de conexión**: El servidor ahora reintenta la conexión automáticamente cada 5 segundos
+
+### Verificar la Conexión
+
+Los logs del servidor ahora proporcionan información más detallada:
+- ✅ Conexión exitosa: "Conectado exitosamente a MongoDB Atlas"
+- ❌ Error de autenticación: Verifica credenciales y permisos
+- ❌ Error de red: Verifica la URI y conexión a internet
+- ❌ Error de IP: Agrega 0.0.0.0/0 en Network Access

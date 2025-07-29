@@ -13,3 +13,7 @@ services:
           type: web
           name: miau-store
           property: port
+      - key: MONGODB_URI
+        value: mongodb+srv://23202001:23202001@cluster0.vgypvgq.mongodb.net/miau_store?retryWrites=true&w=majority&appName=Cluster0
+      - key: JWT_SECRET
+        value: miau_store_jwt_secret_key_2024_secure_random_string
