@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(express.static('.'));
 
 // MongoDB connection with improved error handling
-const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/miau_store';
+const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://23202001:23202001@cluster0.vgypvgq.mongodb.net/miau_store?retryWrites=true&w=majority&appName=Cluster0';
 
 console.log('🔄 Intentando conectar a MongoDB...');
 console.log('📍 URI de conexión:', mongoUri.replace(/\/\/([^:]+):([^@]+)@/, '//***:***@')); // Hide credentials in logs
@@ -36,24 +36,35 @@ const connectToMongoDB = async () => {
     await mongoose.connect(mongoUri, {
       serverSelectionTimeoutMS: 10000, // 10 seconds timeout
       socketTimeoutMS: 45000, // 45 seconds socket timeout
+      maxPoolSize: 10, // Maximum number of connections
+      bufferCommands: false, // Disable mongoose buffering
     });
     console.log('✅ Conectado exitosamente a MongoDB Atlas');
+    
+    // Test the connection by listing collections
+    const collections = await mongoose.connection.db.listCollections().toArray();
+    console.log('📊 Base de datos conectada con', collections.length, 'colecciones');
+    
   } catch (error) {
     console.error('❌ Error conectando a MongoDB:', error.message);
     
     // Provide specific error guidance
-    if (error.message.includes('authentication failed')) {
+    if (error.message.includes('authentication failed') || error.message.includes('bad auth')) {
       console.error('🔐 Error de autenticación: Verifica las credenciales de MongoDB Atlas');
-      console.error('   - Usuario y contraseña correctos');
-      console.error('   - Base de datos especificada en la URI');
-      console.error('   - Permisos del usuario en la base de datos');
+      console.error('   - Usuario: 23202001 (debe existir en Database Access)');
+      console.error('   - Contraseña: 23202001 (debe ser correcta)');
+      console.error('   - Base de datos: miau_store (debe estar especificada en la URI)');
+      console.error('   - Permisos: El usuario debe tener rol readWrite en miau_store');
+      console.error('   - URI completa debe incluir: /miau_store antes de los parámetros');
     } else if (error.message.includes('ENOTFOUND')) {
       console.error('🌐 Error de red: No se puede resolver el hostname de MongoDB Atlas');
       console.error('   - Verifica la conexión a internet');
       console.error('   - Verifica que la URI de MongoDB sea correcta');
-    } else if (error.message.includes('IP not in whitelist')) {
+      console.error('   - Cluster: cluster0.vgypvgq.mongodb.net debe estar activo');
+    } else if (error.message.includes('IP') || error.message.includes('whitelist')) {
       console.error('🚫 Error de IP: La IP no está en la lista blanca de MongoDB Atlas');
       console.error('   - Agrega 0.0.0.0/0 en Network Access de MongoDB Atlas');
+      console.error('   - O agrega tu IP específica');
     }
     
     console.error('🔄 Reintentando conexión en 5 segundos...');
