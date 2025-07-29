@@ -31,8 +31,8 @@ Una tienda en línea completa dedicada a productos para gatos, construida con No
 
 1. **Clona el repositorio**
    ```bash
-   git clone https://github.com/tu-usuario/miau-store.git
-   cd miau-store
+   git clone https://github.com/Jahir7946/Cat_store.git
+   cd Cat_store
    ```
 
 2. **Instala las dependencias**

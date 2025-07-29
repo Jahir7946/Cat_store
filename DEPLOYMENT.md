@@ -17,14 +17,9 @@
 
 ### 2. Preparar el Repositorio
 
-1. Sube tu código a GitHub:
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit"
-   git branch -M main
-   git remote add origin https://github.com/tu-usuario/miau-store.git
-   git push -u origin main
+1. Tu código ya está en GitHub:
+   ```
+   Repositorio: https://github.com/Jahir7946/Cat_store
    ```
 
 ### 3. Configurar Render
