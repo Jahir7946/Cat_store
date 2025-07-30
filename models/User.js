@@ -24,6 +24,10 @@ const userSchema = new mongoose.Schema({
     enum: ['user', 'admin'],
     default: 'user'
   },
+  isAdmin: {
+    type: Boolean,
+    default: false
+  },
   address: {
     street: String,
     city: String,

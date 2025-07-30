@@ -24,7 +24,7 @@ export const authenticateToken = (req, res, next) => {
 
 // Optional: Middleware to check if user is admin
 export const isAdmin = (req, res, next) => {
-  if (!req.user.isAdmin) {
+  if (req.user.role !== 'admin') {
     return res.status(403).json({ message: 'Acceso denegado: se requieren permisos de administrador' });
   }
   next();
