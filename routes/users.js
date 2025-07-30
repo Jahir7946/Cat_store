@@ -18,7 +18,8 @@ router.post('/register', async (req, res) => {
     const user = new User({
       name: req.body.name,
       email: req.body.email,
-      password: req.body.password
+      password: req.body.password,
+      role: req.body.email === '23202001@utfv.edu.mx' ? 'admin' : 'user'
     });
 
     await user.save();

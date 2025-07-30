@@ -37,6 +37,18 @@ async function cleanDatabase() {
             }
         }
 
+        // Drop the users collection to remove problematic username index
+        try {
+            await mongoose.connection.db.collection('users').drop();
+            console.log('🗑️ Colección users eliminada completamente');
+        } catch (error) {
+            if (error.message.includes('ns not found')) {
+                console.log('ℹ️ La colección users no existía');
+            } else {
+                console.log('⚠️ Error eliminando colección users:', error.message);
+            }
+        }
+
         console.log('🧹 Base de datos limpiada completamente');
 
     } catch (error) {

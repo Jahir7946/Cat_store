@@ -209,6 +209,16 @@ const renderAuthModal = () => {
         authModalTitle.textContent = 'Mi Perfil';
         profileName.textContent = state.currentUser.name;
         profileEmail.textContent = state.currentUser.email;
+        
+        // Show admin panel if user is admin
+        const adminPanel = document.getElementById('admin-panel');
+        if (adminPanel) {
+            if (state.currentUser.role === 'admin') {
+                adminPanel.classList.remove('hidden');
+            } else {
+                adminPanel.classList.add('hidden');
+            }
+        }
     } else {
         // Show Login Form
         profileView.classList.add('hidden');
@@ -793,6 +803,36 @@ const init = async () => {
 
         // Add event listeners to the new buttons
         showLoginBtn.addEventListener('click', showLoginForm); // For the "Ya tienes cuenta?" button in register form
+
+        // Admin panel event listeners
+        const adminProductsBtn = document.getElementById('admin-products-btn');
+        const adminCategoriesBtn = document.getElementById('admin-categories-btn');
+        const adminOrdersBtn = document.getElementById('admin-orders-btn');
+        const adminUsersBtn = document.getElementById('admin-users-btn');
+
+        if (adminProductsBtn) {
+            adminProductsBtn.addEventListener('click', () => {
+                alert('Funcionalidad de gestión de productos en desarrollo');
+            });
+        }
+
+        if (adminCategoriesBtn) {
+            adminCategoriesBtn.addEventListener('click', () => {
+                alert('Funcionalidad de gestión de categorías en desarrollo');
+            });
+        }
+
+        if (adminOrdersBtn) {
+            adminOrdersBtn.addEventListener('click', () => {
+                alert('Funcionalidad de ver todos los pedidos en desarrollo');
+            });
+        }
+
+        if (adminUsersBtn) {
+            adminUsersBtn.addEventListener('click', () => {
+                alert('Funcionalidad de gestión de usuarios en desarrollo');
+            });
+        }
 
         // Ensure login form is visible by default when modal opens (no tabs to control this)
         showLoginForm();
