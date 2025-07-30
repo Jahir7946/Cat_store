@@ -49,12 +49,41 @@ export const productsAPI = {
         return fetchAPI(`/products?${params}`);
     },
     getById: (id) => fetchAPI(`/products/${id}`),
+    // Admin functions
+    getAllForAdmin: (filters = {}) => {
+        const params = new URLSearchParams(filters);
+        return fetchAPI(`/products/admin/all?${params}`);
+    },
+    create: (productData) => fetchAPI('/products', {
+        method: 'POST',
+        body: JSON.stringify(productData)
+    }),
+    update: (id, productData) => fetchAPI(`/products/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(productData)
+    }),
+    delete: (id) => fetchAPI(`/products/${id}`, {
+        method: 'DELETE'
+    })
 };
 
 // Categories API
 export const categoriesAPI = {
     getAll: () => fetchAPI('/categories'),
     getById: (id) => fetchAPI(`/categories/${id}`),
+    // Admin functions
+    getAllForAdmin: () => fetchAPI('/categories/admin/all'),
+    create: (categoryData) => fetchAPI('/categories', {
+        method: 'POST',
+        body: JSON.stringify(categoryData)
+    }),
+    update: (id, categoryData) => fetchAPI(`/categories/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(categoryData)
+    }),
+    delete: (id) => fetchAPI(`/categories/${id}`, {
+        method: 'DELETE'
+    })
 };
 
 // Users API

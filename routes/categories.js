@@ -1,5 +1,6 @@
 import express from 'express';
 import Category from '../models/Category.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -11,6 +12,22 @@ router.get('/', async (req, res) => {
   } catch (error) {
     console.error('Error fetching categories:', error);
     res.status(500).json({ message: 'Error al obtener categorías' });
+  }
+});
+
+// GET /api/categories/admin/all - Get all categories for admin (including inactive)
+router.get('/admin/all', authenticateToken, async (req, res) => {
+  try {
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Acceso denegado. Se requieren permisos de administrador.' });
+    }
+
+    const categories = await Category.find({}).sort({ name: 1 });
+    res.json(categories);
+  } catch (error) {
+    console.error('Error fetching admin categories:', error);
+    res.status(500).json({ message: 'Error al obtener categorías para administrador' });
   }
 });
 
@@ -29,8 +46,13 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/categories - Create new category (admin only)
-router.post('/', async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
   try {
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Acceso denegado. Se requieren permisos de administrador.' });
+    }
+
     const category = new Category(req.body);
     await category.save();
     res.status(201).json(category);
@@ -41,8 +63,13 @@ router.post('/', async (req, res) => {
 });
 
 // PUT /api/categories/:id - Update category (admin only)
-router.put('/:id', async (req, res) => {
+router.put('/:id', authenticateToken, async (req, res) => {
   try {
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Acceso denegado. Se requieren permisos de administrador.' });
+    }
+
     const category = await Category.findOneAndUpdate(
       { id: req.params.id },
       req.body,
@@ -59,8 +86,13 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE /api/categories/:id - Delete category (admin only)
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticateToken, async (req, res) => {
   try {
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Acceso denegado. Se requieren permisos de administrador.' });
+    }
+
     const category = await Category.findOneAndUpdate(
       { id: req.params.id },
       { isActive: false },

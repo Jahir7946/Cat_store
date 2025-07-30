@@ -707,6 +707,367 @@ const hideLoading = () => {
     }
 };
 
+// ADMIN PANEL FUNCTIONS
+
+// Admin Products Management
+const showAdminProducts = async () => {
+    try {
+        hideAuthModal();
+        const response = await productsAPI.getAllForAdmin();
+        const products = response.products || response;
+        
+        const adminContent = `
+            <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" id="admin-products-modal">
+                <div class="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+                    <div class="flex justify-between items-center p-6 border-b">
+                        <h2 class="text-2xl font-bold text-gray-800">Gestión de Productos</h2>
+                        <div class="flex gap-2">
+                            <button id="add-product-btn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                                Agregar Producto
+                            </button>
+                            <button id="close-admin-products" class="text-gray-500 hover:text-gray-700">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6 overflow-y-auto max-h-[70vh]">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white border border-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Imagen</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Precio</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Categoría</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    ${products.map(product => `
+                                        <tr>
+                                            <td class="px-4 py-2">
+                                                <img src="${product.image}" alt="${product.name}" class="w-12 h-12 object-cover rounded">
+                                            </td>
+                                            <td class="px-4 py-2 font-medium text-gray-900">${product.name}</td>
+                                            <td class="px-4 py-2 text-gray-900">$${product.price.toFixed(2)}</td>
+                                            <td class="px-4 py-2 text-gray-900">${product.category}</td>
+                                            <td class="px-4 py-2">
+                                                <span class="px-2 py-1 text-xs rounded-full ${product.inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                                    ${product.inStock ? 'En Stock' : 'Agotado'}
+                                                </span>
+                                            </td>
+                                            <td class="px-4 py-2">
+                                                <button onclick="editProduct('${product._id}')" class="text-blue-600 hover:text-blue-800 mr-2">Editar</button>
+                                                <button onclick="deleteProduct('${product._id}')" class="text-red-600 hover:text-red-800">Eliminar</button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', adminContent);
+        
+        // Add event listeners
+        document.getElementById('close-admin-products').addEventListener('click', () => {
+            document.getElementById('admin-products-modal').remove();
+        });
+        
+        document.getElementById('add-product-btn').addEventListener('click', showAddProductForm);
+        
+    } catch (error) {
+        console.error('Error loading admin products:', error);
+        alert('Error al cargar productos: ' + error.message);
+    }
+};
+
+// Admin Categories Management
+const showAdminCategories = async () => {
+    try {
+        hideAuthModal();
+        const categories = await categoriesAPI.getAllForAdmin();
+        
+        const adminContent = `
+            <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" id="admin-categories-modal">
+                <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+                    <div class="flex justify-between items-center p-6 border-b">
+                        <h2 class="text-2xl font-bold text-gray-800">Gestión de Categorías</h2>
+                        <div class="flex gap-2">
+                            <button id="add-category-btn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                                Agregar Categoría
+                            </button>
+                            <button id="close-admin-categories" class="text-gray-500 hover:text-gray-700">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6 overflow-y-auto max-h-[70vh]">
+                        <div class="grid gap-4">
+                            ${categories.map(category => `
+                                <div class="border rounded-lg p-4 flex justify-between items-center">
+                                    <div>
+                                        <h3 class="font-semibold text-gray-900">${category.name}</h3>
+                                        <p class="text-gray-600 text-sm">${category.description}</p>
+                                        <span class="px-2 py-1 text-xs rounded-full ${category.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                            ${category.isActive ? 'Activa' : 'Inactiva'}
+                                        </span>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button onclick="editCategory('${category.id}')" class="text-blue-600 hover:text-blue-800">Editar</button>
+                                        <button onclick="deleteCategory('${category.id}')" class="text-red-600 hover:text-red-800">
+                                            ${category.isActive ? 'Desactivar' : 'Activar'}
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', adminContent);
+        
+        // Add event listeners
+        document.getElementById('close-admin-categories').addEventListener('click', () => {
+            document.getElementById('admin-categories-modal').remove();
+        });
+        
+        document.getElementById('add-category-btn').addEventListener('click', showAddCategoryForm);
+        
+    } catch (error) {
+        console.error('Error loading admin categories:', error);
+        alert('Error al cargar categorías: ' + error.message);
+    }
+};
+
+// Admin Orders Management
+const showAdminOrders = async () => {
+    try {
+        hideAuthModal();
+        const orders = await ordersAPI.getAll();
+        
+        const adminContent = `
+            <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" id="admin-orders-modal">
+                <div class="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+                    <div class="flex justify-between items-center p-6 border-b">
+                        <h2 class="text-2xl font-bold text-gray-800">Gestión de Pedidos</h2>
+                        <button id="close-admin-orders" class="text-gray-500 hover:text-gray-700">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="p-6 overflow-y-auto max-h-[70vh]">
+                        <div class="space-y-4">
+                            ${orders.length > 0 ? orders.map(order => `
+                                <div class="border rounded-lg p-4">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div>
+                                            <h3 class="font-semibold text-gray-900">Pedido #${order.orderNumber || order._id.slice(-6)}</h3>
+                                            <p class="text-gray-600 text-sm">Cliente: ${order.shippingInfo?.name || 'N/A'}</p>
+                                            <p class="text-gray-600 text-sm">Email: ${order.shippingInfo?.email || 'N/A'}</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                                                ${order.status || 'Pendiente'}
+                                            </span>
+                                            <p class="text-lg font-bold text-gray-900 mt-1">$${order.total?.toFixed(2) || '0.00'}</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-sm text-gray-600">
+                                        <p>Fecha: ${new Date(order.createdAt).toLocaleDateString()}</p>
+                                        <p>Productos: ${order.items?.length || 0} artículos</p>
+                                    </div>
+                                </div>
+                            `).join('') : '<p class="text-gray-500 text-center">No hay pedidos disponibles</p>'}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', adminContent);
+        
+        // Add event listeners
+        document.getElementById('close-admin-orders').addEventListener('click', () => {
+            document.getElementById('admin-orders-modal').remove();
+        });
+        
+    } catch (error) {
+        console.error('Error loading admin orders:', error);
+        alert('Error al cargar pedidos: ' + error.message);
+    }
+};
+
+// Admin Users Management
+const showAdminUsers = () => {
+    hideAuthModal();
+    alert('Funcionalidad de gestión de usuarios en desarrollo. Esta función permitirá ver y gestionar todos los usuarios registrados.');
+};
+
+// Product Management Functions
+const showAddProductForm = () => {
+    const formContent = `
+        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" id="product-form-modal">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+                <div class="flex justify-between items-center p-6 border-b">
+                    <h2 class="text-2xl font-bold text-gray-800">Agregar Producto</h2>
+                    <button id="close-product-form" class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <form id="product-form" class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                        <input type="text" name="name" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                        <textarea name="description" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500" rows="3"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Precio</label>
+                            <input type="number" name="price" step="0.01" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+                            <select name="category" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                <option value="">Seleccionar categoría</option>
+                                <option value="alimento">Alimento</option>
+                                <option value="juguetes">Juguetes</option>
+                                <option value="accesorios">Accesorios</option>
+                                <option value="salud">Salud</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">URL de Imagen</label>
+                        <input type="url" name="image" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Rating (1-5)</label>
+                            <input type="number" name="rating" min="1" max="5" value="5" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" name="inStock" checked class="mr-2">
+                            <label class="text-sm font-medium text-gray-700">En Stock</label>
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-2 pt-4">
+                        <button type="button" id="cancel-product-form" class="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600">
+                            Guardar Producto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', formContent);
+    
+    // Add event listeners
+    document.getElementById('close-product-form').addEventListener('click', () => {
+        document.getElementById('product-form-modal').remove();
+    });
+    
+    document.getElementById('cancel-product-form').addEventListener('click', () => {
+        document.getElementById('product-form-modal').remove();
+    });
+    
+    document.getElementById('product-form').addEventListener('submit', handleAddProduct);
+};
+
+const handleAddProduct = async (e) => {
+    e.preventDefault();
+    try {
+        const formData = new FormData(e.target);
+        const productData = {
+            name: formData.get('name'),
+            description: formData.get('description'),
+            price: parseFloat(formData.get('price')),
+            category: formData.get('category'),
+            image: formData.get('image'),
+            rating: parseInt(formData.get('rating')),
+            inStock: formData.has('inStock')
+        };
+        
+        await productsAPI.create(productData);
+        alert('Producto creado exitosamente');
+        document.getElementById('product-form-modal').remove();
+        document.getElementById('admin-products-modal').remove();
+        showAdminProducts(); // Refresh the products list
+    } catch (error) {
+        console.error('Error creating product:', error);
+        alert('Error al crear producto: ' + error.message);
+    }
+};
+
+// Global functions for product management
+window.editProduct = async (productId) => {
+    try {
+        const product = await productsAPI.getById(productId);
+        // Similar form to add but pre-filled with product data
+        alert('Función de editar producto en desarrollo. ID: ' + productId);
+    } catch (error) {
+        console.error('Error loading product for edit:', error);
+        alert('Error al cargar producto: ' + error.message);
+    }
+};
+
+window.deleteProduct = async (productId) => {
+    if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+        try {
+            await productsAPI.delete(productId);
+            alert('Producto eliminado exitosamente');
+            document.getElementById('admin-products-modal').remove();
+            showAdminProducts(); // Refresh the products list
+        } catch (error) {
+            console.error('Error deleting product:', error);
+            alert('Error al eliminar producto: ' + error.message);
+        }
+    }
+};
+
+// Category Management Functions
+const showAddCategoryForm = () => {
+    alert('Función de agregar categoría en desarrollo');
+};
+
+window.editCategory = (categoryId) => {
+    alert('Función de editar categoría en desarrollo. ID: ' + categoryId);
+};
+
+window.deleteCategory = async (categoryId) => {
+    if (confirm('¿Estás seguro de que quieres cambiar el estado de esta categoría?')) {
+        try {
+            await categoriesAPI.delete(categoryId);
+            alert('Estado de categoría cambiado exitosamente');
+            document.getElementById('admin-categories-modal').remove();
+            showAdminCategories(); // Refresh the categories list
+        } catch (error) {
+            console.error('Error changing category status:', error);
+            alert('Error al cambiar estado de categoría: ' + error.message);
+        }
+    }
+};
+
 // INITIALIZATION
 const init = async () => {
     try {
@@ -811,27 +1172,19 @@ const init = async () => {
         const adminUsersBtn = document.getElementById('admin-users-btn');
 
         if (adminProductsBtn) {
-            adminProductsBtn.addEventListener('click', () => {
-                alert('Funcionalidad de gestión de productos en desarrollo');
-            });
+            adminProductsBtn.addEventListener('click', showAdminProducts);
         }
 
         if (adminCategoriesBtn) {
-            adminCategoriesBtn.addEventListener('click', () => {
-                alert('Funcionalidad de gestión de categorías en desarrollo');
-            });
+            adminCategoriesBtn.addEventListener('click', showAdminCategories);
         }
 
         if (adminOrdersBtn) {
-            adminOrdersBtn.addEventListener('click', () => {
-                alert('Funcionalidad de ver todos los pedidos en desarrollo');
-            });
+            adminOrdersBtn.addEventListener('click', showAdminOrders);
         }
 
         if (adminUsersBtn) {
-            adminUsersBtn.addEventListener('click', () => {
-                alert('Funcionalidad de gestión de usuarios en desarrollo');
-            });
+            adminUsersBtn.addEventListener('click', showAdminUsers);
         }
 
         // Ensure login form is visible by default when modal opens (no tabs to control this)
