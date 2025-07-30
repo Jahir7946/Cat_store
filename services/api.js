@@ -2,7 +2,7 @@
 const getApiUrl = () => {
     // Check if we're in development (localhost)
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        return 'http://localhost:3000/api';
+        return 'http://localhost:3001/api';
     }
     // For production (render.com or any other domain), use the current origin
     return `${window.location.origin}/api`;

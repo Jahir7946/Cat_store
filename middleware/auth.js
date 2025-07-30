@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
 
-export const authenticateToken = (req, res, next) => {
+export const authenticateToken = async (req, res, next) => {
   try {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
@@ -9,12 +10,24 @@ export const authenticateToken = (req, res, next) => {
       return res.status(401).json({ message: 'No se proporcionó token de autenticación' });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
       if (err) {
         return res.status(403).json({ message: 'Token inválido o expirado' });
       }
-      req.user = user;
-      next();
+      
+      try {
+        // Get full user data from database
+        const user = await User.findById(decoded.userId).select('-password');
+        if (!user) {
+          return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+        
+        req.user = user;
+        next();
+      } catch (dbError) {
+        console.error('Error fetching user from database:', dbError);
+        return res.status(500).json({ message: 'Error al obtener datos del usuario' });
+      }
     });
   } catch (error) {
     console.error('Error in auth middleware:', error);
