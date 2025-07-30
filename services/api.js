@@ -1,5 +1,14 @@
-// API base URL
-const API_URL = 'http://localhost:3000/api';
+// API base URL - Dynamic configuration for different environments
+const getApiUrl = () => {
+    // Check if we're in development (localhost)
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return 'http://localhost:3000/api';
+    }
+    // For production (render.com or any other domain), use the current origin
+    return `${window.location.origin}/api`;
+};
+
+const API_URL = getApiUrl();
 
 // Helper function for making API requests
 async function fetchAPI(endpoint, options = {}) {
