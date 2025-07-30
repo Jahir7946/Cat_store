@@ -1,0 +1,11 @@
+email,password,name,search_term,category
+testuser1@miaustore.com,password123,Test User 1,cat food,food
+testuser2@miaustore.com,password123,Test User 2,cat toy,toys
+testuser3@miaustore.com,password123,Test User 3,cat health,health
+testuser4@miaustore.com,password123,Test User 4,cat accessory,accessories
+testuser5@miaustore.com,password123,Test User 5,kitten,food
+testuser6@miaustore.com,password123,Test User 6,scratching,toys
+testuser7@miaustore.com,password123,Test User 7,vitamins,health
+testuser8@miaustore.com,password123,Test User 8,collar,accessories
+testuser9@miaustore.com,password123,Test User 9,treats,food
+testuser10@miaustore.com,password123,Test User 10,ball,toys

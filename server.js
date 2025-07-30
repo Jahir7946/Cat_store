@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(express.static('.'));
 
 // MongoDB connection with improved error handling
-const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://23202001:23202001@cluster0.vgypvgq.mongodb.net/miau_store?retryWrites=true&w=majority&appName=Cluster0';
+const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://23202001:23202001@cluster0.vgypvgq.mongodb.net/catstore?retryWrites=true&w=majority&appName=Cluster0';
 
 console.log('🔄 Intentando conectar a MongoDB...');
 console.log('📍 URI de conexión:', mongoUri.replace(/\/\/([^:]+):([^@]+)@/, '//***:***@')); // Hide credentials in logs
